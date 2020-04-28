@@ -1974,7 +1974,7 @@ __webpack_require__.r(__webpack_exports__);
   methods: {
     newContact: function newContact() {
       var params = {
-        id: "",
+        id: this.id,
         photo: this.photo,
         name: this.name,
         email: this.email
@@ -2121,7 +2121,7 @@ __webpack_require__.r(__webpack_exports__);
   props: ["contacts"],
   data: function data() {
     return {
-      editMode: false
+      editMode: 0
     };
   },
   mounted: function mounted() {
@@ -2131,11 +2131,11 @@ __webpack_require__.r(__webpack_exports__);
     onClickDelete: function onClickDelete(index) {
       this.contacts.splice(index, 1);
     },
-    onClickEdit: function onClickEdit() {
-      this.editMode = true;
+    onClickEdit: function onClickEdit(data) {
+      this.editMode = data.id;
     },
     onClickUpdate: function onClickUpdate(index, contact) {
-      this.editMode = false;
+      this.editMode = 0;
       this.contacts[index] = contact;
     }
   }
@@ -38063,7 +38063,7 @@ var render = function() {
             _c("td", [_vm._v(_vm._s(contact.photo))]),
             _vm._v(" "),
             _c("td", [
-              _vm.editMode
+              _vm.editMode == contact.id
                 ? _c("input", {
                     directives: [
                       {
@@ -38089,7 +38089,7 @@ var render = function() {
             ]),
             _vm._v(" "),
             _c("td", [
-              _vm.editMode
+              _vm.editMode == contact.id
                 ? _c("input", {
                     directives: [
                       {
@@ -38115,7 +38115,7 @@ var render = function() {
             ]),
             _vm._v(" "),
             _c("td", [
-              _vm.editMode
+              _vm.editMode == contact.id
                 ? _c(
                     "button",
                     {
@@ -38140,7 +38140,7 @@ var render = function() {
                       staticClass: "btn btn-warning btn-icon-split",
                       on: {
                         click: function($event) {
-                          return _vm.onClickEdit()
+                          return _vm.onClickEdit(contact)
                         }
                       }
                     },

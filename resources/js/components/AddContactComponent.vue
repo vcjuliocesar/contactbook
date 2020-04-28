@@ -65,7 +65,7 @@ export default {
   methods:{
       newContact(){
           const params = {
-              id:"",
+              id:this.id,
               photo:this.photo,
               name:this.name,
               email:this.email,

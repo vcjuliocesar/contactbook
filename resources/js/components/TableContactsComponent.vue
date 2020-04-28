@@ -14,21 +14,21 @@
         <td>{{contact.id}}</td>
         <td>{{contact.photo}}</td>
         <td>
-          <input v-if="editMode" type="text" class="form-control" v-model="contact.name"/>
+          <input v-if="editMode == contact.id" type="text" class="form-control" v-model="contact.name"/>
           <p v-else>{{contact.name}}</p>
         </td>
         <td>
-          <input v-if="editMode" type="text" class="form-control" v-model="contact.email"/>
+          <input v-if="editMode == contact.id" type="text" class="form-control" v-model="contact.email"/>
           <p v-else>{{contact.email}}</p>
         </td>
         <td>
-          <button v-if="editMode" class="btn btn-success btn-icon-split" v-on:click="onClickUpdate(index,contact)">
+          <button v-if="editMode == contact.id" class="btn btn-success btn-icon-split" v-on:click="onClickUpdate(index,contact)">
             <span class="icon text-white-50">
               <i class="fas fa-edit"></i>
             </span>
             <span class="text">Save Changes</span>
           </button>
-          <button v-else class="btn btn-warning btn-icon-split" v-on:click="onClickEdit()">
+          <button v-else class="btn btn-warning btn-icon-split" v-on:click="onClickEdit(contact)">
             <span class="icon text-white-50">
               <i class="fas fa-edit"></i>
             </span>
@@ -52,7 +52,7 @@ export default {
   props: ["contacts"],
   data() {
     return {
-      editMode: false
+      editMode: 0
     };
   },
   mounted() {
@@ -62,11 +62,11 @@ export default {
     onClickDelete(index) {
       this.contacts.splice(index, 1);
     },
-    onClickEdit() {
-      this.editMode = true;
+    onClickEdit(data) {
+      this.editMode = data.id;
     },
     onClickUpdate(index,contact){
-        this.editMode = false;
+        this.editMode = 0;
         this.contacts[index]=contact;
     }
   }
