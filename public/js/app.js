@@ -2184,10 +2184,17 @@ __webpack_require__.r(__webpack_exports__);
     onClickDelete: function onClickDelete(index, contact) {
       var _this = this;
 
+      var config = {
+        "X-CSRF-TOKEN": document.head.querySelector('meta[name="csrf-token"]').content
+      };
       axios["delete"]("/contacts", {
         data: {
           id: contact.id
-        }
+        },
+        headers: {
+          Authorization: "*"
+        },
+        config: config
       }).then(function () {
         _this.contacts.splice(index, 1);
       })["catch"](function (error) {

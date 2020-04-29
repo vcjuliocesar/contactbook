@@ -45,7 +45,7 @@ class ContactController extends Controller
     {
     }
 
-    public function destroy($id)
+    public function destroy(Request $id)
     {
         Contact::findOrFail($id)->delete();
     }

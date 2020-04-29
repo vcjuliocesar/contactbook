@@ -82,8 +82,16 @@ export default {
   },
   methods: {
     onClickDelete(index, contact) {
+      const config = {
+        "X-CSRF-TOKEN": document.head.querySelector('meta[name="csrf-token"]')
+          .content
+      };
       axios
-        .delete("/contacts", {data:{id:contact.id}})
+        .delete("/contacts", {
+          data: { id: contact.id },
+          headers: { Authorization: "*" },
+          config
+        })
         .then(() => {
           this.contacts.splice(index, 1);
         })
