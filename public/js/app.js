@@ -1959,11 +1959,21 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
     return {
-      id: 3,
-      photo: "photo",
+      photo: "",
       name: "",
       email: ""
     };
@@ -1972,20 +1982,34 @@ __webpack_require__.r(__webpack_exports__);
     console.log("Component mounted.");
   },
   methods: {
+    onFileChange: function onFileChange(e) {
+      this.photo = e.target.files[0];
+    },
     newContact: function newContact() {
+      var config = {
+        "X-CSRF-TOKEN": document.head.querySelector('meta[name="csrf-token"]').content
+      };
       var params = {
-        id: this.id,
         photo: this.photo,
         name: this.name,
         email: this.email
       };
-      this.$emit('new', params);
-      this.photo = '';
-      this.name = '';
-      this.email = '';
+      var formData = new FormData();
+      formData.append('photo', this.photo);
+      formData.append('name', this.name);
+      formData.append('email', this.email); //console.log(params);
+
+      axios.post("/contacts", formData, config).then(function (response) {
+        var contact = response.data;
+        console.log(contact);
+      });
+      this.$emit("new", params);
+      this.photo = "";
+      this.name = "";
+      this.email = "";
     },
     hideModal: function hideModal() {
-      $('#exampleModal').modal('toggle');
+      $("#exampleModal").modal("toggle");
     }
   }
 });
@@ -37807,7 +37831,7 @@ var render = function() {
           _c(
             "form",
             {
-              attrs: { action: "" },
+              attrs: { action: "", enctype: "multipart/form-data" },
               on: {
                 submit: function($event) {
                   $event.preventDefault()
@@ -37817,7 +37841,15 @@ var render = function() {
             },
             [
               _c("div", { staticClass: "modal-body" }, [
-                _vm._m(1),
+                _c("div", { staticClass: "form-group" }, [
+                  _c("label", { attrs: { for: "photo" } }, [_vm._v("Photo")]),
+                  _vm._v(" "),
+                  _c("input", {
+                    staticClass: "form-control-file",
+                    attrs: { type: "file", id: "exampleFormControlFile1" },
+                    on: { change: _vm.onFileChange }
+                  })
+                ]),
                 _vm._v(" "),
                 _c("div", { staticClass: "form-group" }, [
                   _c("label", { attrs: { for: "Name" } }, [_vm._v("Name")]),
@@ -37938,19 +37970,6 @@ var staticRenderFns = [
         },
         [_c("span", { attrs: { "aria-hidden": "true" } }, [_vm._v("×")])]
       )
-    ])
-  },
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("div", { staticClass: "form-group" }, [
-      _c("label", { attrs: { for: "photo" } }, [_vm._v("Photo")]),
-      _vm._v(" "),
-      _c("input", {
-        staticClass: "form-control-file",
-        attrs: { type: "file", id: "exampleFormControlFile1" }
-      })
     ])
   }
 ]

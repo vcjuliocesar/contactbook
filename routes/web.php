@@ -20,3 +20,11 @@ Route::get('/', function () {
 Auth::routes();
 
 Route::get('/home', 'HomeController@index')->name('home');
+
+Route::get('/contacts','ContactController@index');
+
+Route::post('/contacts','ContactController@store');
+
+Route::put('/contacts','ContactContoller@update');
+
+Route::delete('/contacts','ContactContoller@destroy');
