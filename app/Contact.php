@@ -10,6 +10,7 @@ class Contact extends Model
         'photo',
         'name',
         'email',
+        'user_id',
     ];
 
     public function user(){

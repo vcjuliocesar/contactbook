@@ -1983,9 +1983,19 @@ __webpack_require__.r(__webpack_exports__);
   },
   methods: {
     onFileChange: function onFileChange(e) {
-      this.photo = e.target.files[0];
+      var _this = this;
+
+      var fileReader = new FileReader();
+      fileReader.readAsDataURL(e.target.files[0]);
+
+      fileReader.onload = function (e) {
+        _this.photo = e.target.result;
+      }; //this.contact.photo = e.target.files[0];
+
     },
     newContact: function newContact() {
+      var _this2 = this;
+
       var config = {
         "X-CSRF-TOKEN": document.head.querySelector('meta[name="csrf-token"]').content
       };
@@ -1995,15 +2005,16 @@ __webpack_require__.r(__webpack_exports__);
         email: this.email
       };
       var formData = new FormData();
-      formData.append('photo', this.photo);
-      formData.append('name', this.name);
-      formData.append('email', this.email); //console.log(params);
-
+      formData.append("photo", this.photo);
+      formData.append("name", this.name);
+      formData.append("email", this.email);
       axios.post("/contacts", formData, config).then(function (response) {
         var contact = response.data;
-        console.log(contact);
+
+        _this2.$emit("new", contact);
+      })["catch"](function (error) {
+        console.log(error);
       });
-      this.$emit("new", params);
       this.photo = "";
       this.name = "";
       this.email = "";
@@ -2058,21 +2069,17 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
     return {
-      contacts: [{
-        id: 1,
-        photo: "photo",
-        name: "Armando",
-        email: "armando@fake.com"
-      }, {
-        id: 2,
-        photo: "photo",
-        name: "Mark Otto",
-        email: "otto@fake.com"
-      }]
+      contacts: []
     };
   },
   mounted: function mounted() {
-    console.log("Component mounted.");
+    var _this = this;
+
+    axios.get('/contacts').then(function (response) {
+      _this.contacts = response.data;
+    })["catch"](function (error) {
+      console.log(error);
+    });
   },
   methods: {
     addContact: function addContact(contact) {
@@ -2140,6 +2147,28 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   /** contacts es una variable que es enviada por el pomponente padre */
   props: ["contacts"],
@@ -2152,8 +2181,18 @@ __webpack_require__.r(__webpack_exports__);
     console.log("Component mounted.");
   },
   methods: {
-    onClickDelete: function onClickDelete(index) {
-      this.contacts.splice(index, 1);
+    onClickDelete: function onClickDelete(index, contact) {
+      var _this = this;
+
+      axios["delete"]("/contacts", {
+        data: {
+          id: contact.id
+        }
+      }).then(function () {
+        _this.contacts.splice(index, 1);
+      })["catch"](function (error) {
+        console.log(error);
+      });
     },
     onClickEdit: function onClickEdit(data) {
       this.editMode = data.id;
@@ -38079,7 +38118,16 @@ var render = function() {
           return _c("tr", { key: contact.id }, [
             _c("td", [_vm._v(_vm._s(contact.id))]),
             _vm._v(" "),
-            _c("td", [_vm._v(_vm._s(contact.photo))]),
+            _c("td", [
+              _c("img", {
+                staticClass: "rounded mx-auto d-block",
+                attrs: {
+                  src: "http://127.0.0.1:8000/" + contact.photo,
+                  width: "96",
+                  height: "65"
+                }
+              })
+            ]),
             _vm._v(" "),
             _c("td", [
               _vm.editMode == contact.id
@@ -38176,7 +38224,7 @@ var render = function() {
                   staticClass: "btn btn-danger btn-icon-split",
                   on: {
                     click: function($event) {
-                      return _vm.onClickDelete(index)
+                      return _vm.onClickDelete(index, contact)
                     }
                   }
                 },

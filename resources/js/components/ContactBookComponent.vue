@@ -32,24 +32,15 @@
 export default {
   data() {
     return {
-      contacts: [
-        {
-          id: 1,
-          photo: "photo",
-          name: "Armando",
-          email: "armando@fake.com"
-        },
-        {
-          id: 2,
-          photo: "photo",
-          name: "Mark Otto",
-          email: "otto@fake.com"
-        }
-      ]
+      contacts: []
     };
   },
   mounted() {
-    console.log("Component mounted.");
+    axios.get('/contacts').then((response)=>{
+        this.contacts = response.data;
+    }).catch((error)=>{
+        console.log(error);
+    });
   },
   methods: {
     addContact(contact) {

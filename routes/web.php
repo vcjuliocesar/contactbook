@@ -27,4 +27,4 @@ Route::post('/contacts','ContactController@store');
 
 Route::put('/contacts','ContactContoller@update');
 
-Route::delete('/contacts','ContactContoller@destroy');
+Route::delete('/contacts/{id}','ContactContoller@destroy');

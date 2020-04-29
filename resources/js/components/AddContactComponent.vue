@@ -74,28 +74,40 @@ export default {
   },
   methods: {
     onFileChange(e) {
-      this.photo = e.target.files[0];
+      var fileReader = new FileReader();
+      fileReader.readAsDataURL(e.target.files[0]);
+      fileReader.onload = e => {
+        this.photo = e.target.result;
+      };
+      //this.contact.photo = e.target.files[0];
     },
     newContact() {
       const config = {
         "X-CSRF-TOKEN": document.head.querySelector('meta[name="csrf-token"]')
           .content
       };
-      const params = {
-        photo: this.photo,
-        name: this.name,
-        email: this.email
+
+      let params = {
+          photo:this.photo,
+          name:this.name,
+          email:this.email,
       };
+
       let formData = new FormData();
-      formData.append('photo',this.photo);
-      formData.append('name',this.name);
-      formData.append('email',this.email);
-      //console.log(params);
-      axios.post("/contacts",formData,config).then(response => {
-        const contact = response.data;
-        console.log(contact);
-      });
-      this.$emit("new", params);
+      formData.append("photo", this.photo);
+      formData.append("name", this.name);
+      formData.append("email", this.email);
+
+      axios
+        .post("/contacts", formData, config)
+        .then(response => {
+          const contact = response.data;
+           this.$emit("new", contact);
+        })
+        .catch(error => {
+          console.log(error);
+        });
+
       this.photo = "";
       this.name = "";
       this.email = "";

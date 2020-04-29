@@ -12,17 +12,39 @@
     <tbody>
       <tr v-for="(contact,index) in contacts" :key="contact.id">
         <td>{{contact.id}}</td>
-        <td>{{contact.photo}}</td>
         <td>
-          <input v-if="editMode == contact.id" type="text" class="form-control" v-model="contact.name"/>
+          <img
+            :src="'http://127.0.0.1:8000/'+contact.photo"
+            class="rounded mx-auto d-block"
+            width="96"
+            height="65"
+          />
+        </td>
+        <!--<td>{{contact.photo}}</td>-->
+        <td>
+          <input
+            v-if="editMode == contact.id"
+            type="text"
+            class="form-control"
+            v-model="contact.name"
+          />
           <p v-else>{{contact.name}}</p>
         </td>
         <td>
-          <input v-if="editMode == contact.id" type="text" class="form-control" v-model="contact.email"/>
+          <input
+            v-if="editMode == contact.id"
+            type="text"
+            class="form-control"
+            v-model="contact.email"
+          />
           <p v-else>{{contact.email}}</p>
         </td>
         <td>
-          <button v-if="editMode == contact.id" class="btn btn-success btn-icon-split" v-on:click="onClickUpdate(index,contact)">
+          <button
+            v-if="editMode == contact.id"
+            class="btn btn-success btn-icon-split"
+            v-on:click="onClickUpdate(index,contact)"
+          >
             <span class="icon text-white-50">
               <i class="fas fa-edit"></i>
             </span>
@@ -34,7 +56,7 @@
             </span>
             <span class="text">Edit</span>
           </button>
-          <button class="btn btn-danger btn-icon-split" v-on:click="onClickDelete(index)">
+          <button class="btn btn-danger btn-icon-split" v-on:click="onClickDelete(index,contact)">
             <span class="icon text-white-50">
               <i class="fas fa-trash"></i>
             </span>
@@ -59,15 +81,22 @@ export default {
     console.log("Component mounted.");
   },
   methods: {
-    onClickDelete(index) {
-      this.contacts.splice(index, 1);
+    onClickDelete(index, contact) {
+      axios
+        .delete("/contacts", {data:{id:contact.id}})
+        .then(() => {
+          this.contacts.splice(index, 1);
+        })
+        .catch(error => {
+          console.log(error);
+        });
     },
     onClickEdit(data) {
       this.editMode = data.id;
     },
-    onClickUpdate(index,contact){
-        this.editMode = 0;
-        this.contacts[index]=contact;
+    onClickUpdate(index, contact) {
+      this.editMode = 0;
+      this.contacts[index] = contact;
     }
   }
 };
