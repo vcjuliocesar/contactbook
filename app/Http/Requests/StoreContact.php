@@ -24,7 +24,7 @@ class StoreContact extends FormRequest
     public function rules()
     {
         return [
-            'image'=>'required|file|image|mimes:jpeg,jpg,png',
+            //'image'=>'file|image|mimes:jpeg,jpg,png',
             'name'=>'required',
             'email'=>'required|email',
         ];

@@ -26,7 +26,7 @@ class ContactController extends Controller
         if ($request->has('image')) {
             $file = $request->file('image');
             $fileName = time() . '.' . $file->getClientOriginalExtension();
-            $file->storeAs('images', $fileName,'public');
+            $file->storeAs('images', $fileName, 'public');
 
             return Contact::create([
                 'image' => $fileName,
@@ -35,12 +35,24 @@ class ContactController extends Controller
                 'user_id' => auth()->id(),
             ]);
         }
-
     }
 
-    public function update()
+    public function update(StoreContact $request, $id)
     {
-        //todo
+        $contact = Contact::find($id);
+
+        if($request->flagImage === "true" && $request->has('image')){
+            $file = $request->file('image');
+            $fileName = time() . '.' . $file->getClientOriginalExtension();
+            $file->storeAs('images', $fileName, 'public');
+            $contact->image = $fileName;
+        }
+
+        $contact->name = $request->name;
+        $contact->email = $request->email;
+        $contact->save();
+
+        return $contact;
     }
 
     public function destroy($id)

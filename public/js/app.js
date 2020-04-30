@@ -1984,11 +1984,6 @@ __webpack_require__.r(__webpack_exports__);
   },
   methods: {
     onFileChange: function onFileChange(e) {
-      /* var fileReader = new FileReader();
-       fileReader.readAsDataURL(e.target.files[0]);
-       fileReader.onload = e => {
-         this.image = e.target.result;
-       };*/
       this.image = e.target.files[0];
     },
     newContact: function newContact() {
@@ -2166,28 +2161,36 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   /** contacts es una variable que es enviada por el pomponente padre */
   props: ["contacts"],
   data: function data() {
     return {
-      editMode: 0
+      image: "",
+      editMode: 0,
+      flagImage: false
     };
   },
   mounted: function mounted() {
     console.log("Component mounted.");
   },
   methods: {
+    onFileChange: function onFileChange(e) {
+      this.image = e.target.files[0];
+      this.flagImage = true;
+    },
     onClickDelete: function onClickDelete(index, contact) {
       var _this = this;
 
-      var config = {
-        "X-CSRF-TOKEN": document.head.querySelector('meta[name="csrf-token"]').content,
-        headers: {
-          "Authorization": "*"
-        }
-      };
-      axios["delete"]("/contacts/".concat(contact.id), config).then(function () {
+      axios["delete"]("/contacts/".concat(contact.id)).then(function (response) {
         _this.contacts.splice(index, 1);
       })["catch"](function (error) {
         console.log(error);
@@ -2197,8 +2200,44 @@ __webpack_require__.r(__webpack_exports__);
       this.editMode = data.id;
     },
     onClickUpdate: function onClickUpdate(index, contact) {
-      this.editMode = 0;
-      this.contacts[index] = contact;
+      var _this2 = this;
+
+      var config = {
+        "X-CSRF-TOKEN": document.head.querySelector('meta[name="csrf-token"]').content,
+        headers: {
+          "content-type": "multipart/form-data"
+        }
+      };
+      var newImage = "";
+
+      if (this.image != undefined) {
+        newImage = this.image;
+      }
+
+      var formData = new FormData();
+      formData.append('image', newImage);
+      formData.append('name', contact.name);
+      formData.append('email', contact.email);
+      formData.append('flagImage', this.flagImage);
+      /*const params = {
+        image: newImage,
+        name: contact.name,
+        email: contact.email,
+        flagImage: this.flagImage,
+        /*"X-CSRF-TOKEN": document.head.querySelector('meta[name="csrf-token"]')
+          .content,
+        headers: { "content-type": "multipart/form-data" }
+      };
+      console.log(params);*/
+
+      axios.post("/contacts/".concat(contact.id), formData, config).then(function (response) {
+        //console.log(response.data);
+        _this2.editMode = 0;
+        _this2.flagImage = false;
+        _this2.contacts[index] = response.data;
+      })["catch"](function (error) {
+        console.log(error);
+      });
     }
   }
 });
@@ -38122,14 +38161,25 @@ var render = function() {
             _c("td", [_vm._v(_vm._s(contact.id))]),
             _vm._v(" "),
             _c("td", [
-              _c("img", {
-                staticClass: "rounded mx-auto d-block",
-                attrs: {
-                  src: "http://127.0.0.1:8000/storage/images/" + contact.image,
-                  width: "96",
-                  height: "65"
-                }
-              })
+              _vm.editMode == contact.id
+                ? _c("input", {
+                    staticClass: "form-control-file",
+                    attrs: {
+                      type: "file",
+                      name: "image",
+                      id: "exampleFormControlFile1"
+                    },
+                    on: { change: _vm.onFileChange }
+                  })
+                : _c("img", {
+                    staticClass: "rounded mx-auto d-block",
+                    attrs: {
+                      src:
+                        "http://127.0.0.1:8000/storage/images/" + contact.image,
+                      width: "96",
+                      height: "65"
+                    }
+                  })
             ]),
             _vm._v(" "),
             _c("td", [

@@ -75,11 +75,6 @@ export default {
   },
   methods: {
     onFileChange(e) {
-     /* var fileReader = new FileReader();
-      fileReader.readAsDataURL(e.target.files[0]);
-      fileReader.onload = e => {
-        this.image = e.target.result;
-      };*/
       this.image = e.target.files[0];
     },
     newContact() {

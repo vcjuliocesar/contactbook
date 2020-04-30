@@ -13,15 +13,23 @@
       <tr v-for="(contact,index) in contacts" :key="contact.id">
         <td>{{contact.id}}</td>
         <td>
+          <input
+            v-if="editMode == contact.id"
+            type="file"
+            name="image"
+            class="form-control-file"
+            v-on:change="onFileChange"
+            id="exampleFormControlFile1"
+          />
+
           <img
+            v-else
             :src="'http://127.0.0.1:8000/storage/images/'+contact.image"
             class="rounded mx-auto d-block"
             width="96"
             height="65"
           />
         </td>
-       <!-- /Users/juliocesar/Sites/contactbook/public/storage/images/1588267207.png-->
-        <!--<td>{{contact.photo}}</td>-->
         <td>
           <input
             v-if="editMode == contact.id"
@@ -75,23 +83,23 @@ export default {
   props: ["contacts"],
   data() {
     return {
-      editMode: 0
+      image: "",
+      editMode: 0,
+      flagImage: false
     };
   },
   mounted() {
     console.log("Component mounted.");
   },
   methods: {
+    onFileChange(e) {
+      this.image = e.target.files[0];
+      this.flagImage = true;
+    },
     onClickDelete(index, contact) {
-      const config = {
-        "X-CSRF-TOKEN": document.head.querySelector('meta[name="csrf-token"]')
-          .content,
-          headers: { "Authorization": "*" }
-      };
-
       axios
-        .delete(`/contacts/${contact.id}`,config)
-        .then(() => {
+        .delete(`/contacts/${contact.id}`)
+        .then(response => {
           this.contacts.splice(index, 1);
         })
         .catch(error => {
@@ -102,8 +110,41 @@ export default {
       this.editMode = data.id;
     },
     onClickUpdate(index, contact) {
-      this.editMode = 0;
-      this.contacts[index] = contact;
+      const config = {
+        "X-CSRF-TOKEN": document.head.querySelector('meta[name="csrf-token"]')
+          .content,
+        headers: { "content-type": "multipart/form-data" }
+      };
+      var newImage = "";
+      if (this.image != undefined) {
+        newImage = this.image;
+      }
+      let formData = new FormData();
+      formData.append('image',newImage);
+      formData.append('name',contact.name);
+      formData.append('email',contact.email);
+      formData.append('flagImage',this.flagImage);
+      /*const params = {
+        image: newImage,
+        name: contact.name,
+        email: contact.email,
+        flagImage: this.flagImage,
+        /*"X-CSRF-TOKEN": document.head.querySelector('meta[name="csrf-token"]')
+          .content,
+        headers: { "content-type": "multipart/form-data" }
+      };
+      console.log(params);*/
+      axios
+        .post(`/contacts/${contact.id}`, formData,config)
+        .then(response => {
+          //console.log(response.data);
+          this.editMode = 0;
+          this.flagImage = false;
+          this.contacts[index] = response.data;
+        })
+        .catch(error => {
+          console.log(error);
+        });
     }
   }
 };
