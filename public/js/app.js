@@ -1970,10 +1970,11 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
     return {
-      photo: "",
+      image: "",
       name: "",
       email: ""
     };
@@ -1983,39 +1984,34 @@ __webpack_require__.r(__webpack_exports__);
   },
   methods: {
     onFileChange: function onFileChange(e) {
-      var _this = this;
-
-      var fileReader = new FileReader();
-      fileReader.readAsDataURL(e.target.files[0]);
-
-      fileReader.onload = function (e) {
-        _this.photo = e.target.result;
-      }; //this.contact.photo = e.target.files[0];
-
+      /* var fileReader = new FileReader();
+       fileReader.readAsDataURL(e.target.files[0]);
+       fileReader.onload = e => {
+         this.image = e.target.result;
+       };*/
+      this.image = e.target.files[0];
     },
     newContact: function newContact() {
-      var _this2 = this;
+      var _this = this;
 
       var config = {
-        "X-CSRF-TOKEN": document.head.querySelector('meta[name="csrf-token"]').content
-      };
-      var params = {
-        photo: this.photo,
-        name: this.name,
-        email: this.email
+        "X-CSRF-TOKEN": document.head.querySelector('meta[name="csrf-token"]').content,
+        headers: {
+          "content-type": "multipart/form-data"
+        }
       };
       var formData = new FormData();
-      formData.append("photo", this.photo);
+      formData.append("image", this.image);
       formData.append("name", this.name);
       formData.append("email", this.email);
       axios.post("/contacts", formData, config).then(function (response) {
         var contact = response.data;
 
-        _this2.$emit("new", contact);
+        _this.$emit("new", contact);
       })["catch"](function (error) {
         console.log(error);
       });
-      this.photo = "";
+      this.image = "";
       this.name = "";
       this.email = "";
     },
@@ -2099,6 +2095,7 @@ __webpack_require__.r(__webpack_exports__);
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
+//
 //
 //
 //
@@ -37887,7 +37884,11 @@ var render = function() {
                   _vm._v(" "),
                   _c("input", {
                     staticClass: "form-control-file",
-                    attrs: { type: "file", id: "exampleFormControlFile1" },
+                    attrs: {
+                      type: "file",
+                      name: "image",
+                      id: "exampleFormControlFile1"
+                    },
                     on: { change: _vm.onFileChange }
                   })
                 ]),
@@ -38124,7 +38125,7 @@ var render = function() {
               _c("img", {
                 staticClass: "rounded mx-auto d-block",
                 attrs: {
-                  src: "http://127.0.0.1:8000/" + contact.photo,
+                  src: "http://127.0.0.1:8000/storage/images/" + contact.image,
                   width: "96",
                   height: "65"
                 }

@@ -14,12 +14,13 @@
         <td>{{contact.id}}</td>
         <td>
           <img
-            :src="'http://127.0.0.1:8000/'+contact.photo"
+            :src="'http://127.0.0.1:8000/storage/images/'+contact.image"
             class="rounded mx-auto d-block"
             width="96"
             height="65"
           />
         </td>
+       <!-- /Users/juliocesar/Sites/contactbook/public/storage/images/1588267207.png-->
         <!--<td>{{contact.photo}}</td>-->
         <td>
           <input

@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Contact extends Model
 {
     protected $fillable = [
-        'photo',
+        'image',
         'name',
         'email',
         'user_id',

@@ -23,6 +23,7 @@
               <label for="photo">Photo</label>
               <input
                 type="file"
+                name="image"
                 class="form-control-file"
                 v-on:change="onFileChange"
                 id="exampleFormControlFile1"
@@ -64,7 +65,7 @@
 export default {
   data() {
     return {
-      photo: "",
+      image: "",
       name: "",
       email: ""
     };
@@ -74,27 +75,24 @@ export default {
   },
   methods: {
     onFileChange(e) {
-      var fileReader = new FileReader();
+     /* var fileReader = new FileReader();
       fileReader.readAsDataURL(e.target.files[0]);
       fileReader.onload = e => {
-        this.photo = e.target.result;
-      };
-      //this.contact.photo = e.target.files[0];
+        this.image = e.target.result;
+      };*/
+      this.image = e.target.files[0];
     },
     newContact() {
       const config = {
         "X-CSRF-TOKEN": document.head.querySelector('meta[name="csrf-token"]')
-          .content
-      };
-
-      let params = {
-          photo:this.photo,
-          name:this.name,
-          email:this.email,
+          .content,
+        headers: {
+          "content-type": "multipart/form-data"
+        }
       };
 
       let formData = new FormData();
-      formData.append("photo", this.photo);
+      formData.append("image", this.image);
       formData.append("name", this.name);
       formData.append("email", this.email);
 
@@ -102,13 +100,13 @@ export default {
         .post("/contacts", formData, config)
         .then(response => {
           const contact = response.data;
-           this.$emit("new", contact);
+          this.$emit("new", contact);
         })
         .catch(error => {
           console.log(error);
         });
 
-      this.photo = "";
+      this.image = "";
       this.name = "";
       this.email = "";
     },

@@ -6,6 +6,7 @@ use App\Contact;
 use App\Http\Requests\StoreContact;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Storage;
 
 class ContactController extends Controller
 {
@@ -16,29 +17,25 @@ class ContactController extends Controller
 
     public function index()
     {
-        return Contact::where('user_id',auth()->id())->get();
+        return Contact::where('user_id', auth()->id())->get();
     }
 
     public function store(StoreContact $request)
     {
-        $exploded = explode(',', $request->photo);
 
-        $decoded = base64_decode($exploded[1]);
+        if ($request->has('image')) {
+            $file = $request->file('image');
+            $fileName = time() . '.' . $file->getClientOriginalExtension();
+            $file->storeAs('images', $fileName,'public');
 
-        $extension = Str::contains($exploded[0], 'jpeg') ? 'jpg' : 'png';
+            return Contact::create([
+                'image' => $fileName,
+                'name' => $request->name,
+                'email' => $request->email,
+                'user_id' => auth()->id(),
+            ]);
+        }
 
-        $fileName = time() . '.' . $extension;
-
-        $path = public_path() . '/' . $fileName;
-
-        file_put_contents($path, $decoded);
-
-        return Contact::create([
-            'photo' => $fileName,
-            'name' => $request->name,
-            'email' => $request->email,
-            'user_id' => auth()->id(),
-        ]);
     }
 
     public function update()
