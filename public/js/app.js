@@ -2185,17 +2185,12 @@ __webpack_require__.r(__webpack_exports__);
       var _this = this;
 
       var config = {
-        "X-CSRF-TOKEN": document.head.querySelector('meta[name="csrf-token"]').content
-      };
-      axios["delete"]("/contacts", {
-        data: {
-          id: contact.id
-        },
+        "X-CSRF-TOKEN": document.head.querySelector('meta[name="csrf-token"]').content,
         headers: {
-          Authorization: "*"
-        },
-        config: config
-      }).then(function () {
+          "Authorization": "*"
+        }
+      };
+      axios["delete"]("/contacts/".concat(contact.id), config).then(function () {
         _this.contacts.splice(index, 1);
       })["catch"](function (error) {
         console.log(error);
