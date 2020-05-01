@@ -16,45 +16,59 @@
             <span aria-hidden="true">&times;</span>
           </button>
         </div>
-        <form action v-on:submit.prevent="newContact()" enctype="multipart/form-data">
+        <form
+          action
+          v-on:submit.prevent="newContact()"
+          v-on:keydown="clear($event.target.name)"
+          enctype="multipart/form-data"
+        >
           <div class="modal-body">
-            <!--<form>-->
             <div class="form-group">
               <label for="photo">Photo</label>
               <input
                 type="file"
                 name="image"
+                ref="image"
                 class="form-control-file"
+                :class="{errors:hasError('image')}"
                 v-on:change="onFileChange"
                 id="exampleFormControlFile1"
               />
+              <span v-if="hasError('image')" v-text="getError('image')" class="error-message"></span>
             </div>
             <div class="form-group">
               <label for="Name">Name</label>
               <input
                 type="text"
+                :class="{errors:hasError('name')}"
                 class="form-control"
                 id="ContactName"
                 placeholder="Name"
                 v-model="name"
               />
+              <span v-if="hasError('name')" v-text="getError('name')" class="error-message"></span>
             </div>
             <div class="form-group">
               <label for="Name">Email address</label>
               <input
                 type="email"
                 class="form-control"
+                :class="{errors:hasError('email')}"
                 id="ContactEmail"
                 aria-describedby="emailHelp"
                 placeholder="Enter email"
                 v-model="email"
               />
+              <span v-if="hasError('email')" v-text="getError('email')" class="error-message"></span>
             </div>
-            <!--</form>-->
           </div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-            <button type="submit" class="btn btn-primary" v-on:click="hideModal()">Save</button>
+            <!--<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>-->
+            <button
+              type="submit"
+              class="btn btn-primary"
+              :disabled="any()"
+            >Save</button>
           </div>
         </form>
       </div>
@@ -67,7 +81,8 @@ export default {
     return {
       image: "",
       name: "",
-      email: ""
+      email: "",
+      errors: {}
     };
   },
   mounted() {
@@ -96,17 +111,36 @@ export default {
         .then(response => {
           const contact = response.data;
           this.$emit("new", contact);
+          $("#exampleModal").modal("toggle");
+          this.$refs.image.value = '';
+          this.image = "";
+          this.name = "";
+          this.email = "";
         })
-        .catch(error => {
-          console.log(error);
+        .catch((error) => {
+          this.errors = error.response.data.errors;
+          console.log(this.errors);
         });
-
-      this.image = "";
-      this.name = "";
-      this.email = "";
     },
-    hideModal() {
-      $("#exampleModal").modal("toggle");
+    any() {
+      return Object.keys(this.errors).length > 0;
+    },
+    hasError(field) {
+      return this.errors.hasOwnProperty(field);
+    },
+
+    getError(field) {
+      if (this.errors[field]) {
+        return this.errors[field][0];
+      }
+    },
+
+    clear(field) {
+      if (field) {
+        delete this.errors[field];
+        return;
+      }
+      this.errors = {};
     }
   }
 };

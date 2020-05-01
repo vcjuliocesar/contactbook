@@ -19,6 +19,30 @@
     <!-- Styles -->
     <link href="{{ asset('css/app.css') }}" rel="stylesheet">
     <link rel="stylesheet" href="{{asset('fontawesome/css/font_awesome.min.css')}}">
+    <style>
+        .error-message {
+  margin: 0 24px 0;
+  color: #AF0C0C;
+  font-style: italic;
+}
+
+.errors {
+  margin-bottom: 24px;
+  padding: 16px;
+  border: 1px solid #AF0C0C;
+  background-color: #feefef;
+  border-radius: 4px;
+  color: #AF0C0C;
+}
+.errors li {
+  margin-bottom: 6px;
+}
+        .field-error {
+                margin-bottom: 12px;
+                border: 1px solid #AF0C0C;
+                box-shadow: 0 2px 4px -2px #7f0909;
+            }
+    </style>
 </head>
 <body>
     <div id="app">

@@ -22,26 +22,27 @@ class ContactController extends Controller
 
     public function store(StoreContact $request)
     {
+        $fileName = 'usuario.jpg';
 
-        if ($request->has('image')) {
+        if ($request->has('image') && $request->image != "") {
             $file = $request->file('image');
             $fileName = time() . '.' . $file->getClientOriginalExtension();
             $file->storeAs('images', $fileName, 'public');
-
-            return Contact::create([
-                'image' => $fileName,
-                'name' => $request->name,
-                'email' => $request->email,
-                'user_id' => auth()->id(),
-            ]);
         }
+
+        return Contact::create([
+            'image' => $fileName,
+            'name' => $request->name,
+            'email' => $request->email,
+            'user_id' => auth()->id(),
+        ]);
     }
 
     public function update(StoreContact $request, $id)
     {
         $contact = Contact::find($id);
 
-        if($request->flagImage === "true" && $request->has('image')){
+        if($request->flagImage === "true" && $request->has('image') && $request->image != ""){
             $file = $request->file('image');
             $fileName = time() . '.' . $file->getClientOriginalExtension();
             $file->storeAs('images', $fileName, 'public');

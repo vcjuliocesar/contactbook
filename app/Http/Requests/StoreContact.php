@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class StoreContact extends FormRequest
 {
@@ -24,9 +25,11 @@ class StoreContact extends FormRequest
     public function rules()
     {
         return [
-            //'image'=>'file|image|mimes:jpeg,jpg,png',
+            'image'=>'nullable|sometimes|image|mimes:jpeg,jpg,png',
             'name'=>'required',
-            'email'=>'required|email',
+            'email'=>["required","email",
+                Rule::unique('contacts', 'email')->ignore($this->contact)
+            ]
         ];
     }
 }

@@ -10,7 +10,7 @@
       </tr>
     </thead>
     <tbody>
-      <tr v-for="(contact,index) in contacts" :key="contact.id">
+      <tr v-for="(contact,index) in contacts" :key="contact.id"   v-on:keydown="clear($event.target.name)">
         <td>{{contact.id}}</td>
         <td>
           <input
@@ -18,6 +18,7 @@
             type="file"
             name="image"
             class="form-control-file"
+            :class="{errors:hasError('image')}"
             v-on:change="onFileChange"
             id="exampleFormControlFile1"
           />
@@ -35,6 +36,7 @@
             v-if="editMode == contact.id"
             type="text"
             class="form-control"
+            :class="{errors:hasError('name')}"
             v-model="contact.name"
           />
           <p v-else>{{contact.name}}</p>
@@ -44,6 +46,7 @@
             v-if="editMode == contact.id"
             type="text"
             class="form-control"
+            :class="{errors:hasError('email')}"
             v-model="contact.email"
           />
           <p v-else>{{contact.email}}</p>
@@ -85,7 +88,8 @@ export default {
     return {
       image: "",
       editMode: 0,
-      flagImage: false
+      flagImage: false,
+      errors: {}
     };
   },
   mounted() {
@@ -120,22 +124,13 @@ export default {
         newImage = this.image;
       }
       let formData = new FormData();
-      formData.append('image',newImage);
-      formData.append('name',contact.name);
-      formData.append('email',contact.email);
-      formData.append('flagImage',this.flagImage);
-      /*const params = {
-        image: newImage,
-        name: contact.name,
-        email: contact.email,
-        flagImage: this.flagImage,
-        /*"X-CSRF-TOKEN": document.head.querySelector('meta[name="csrf-token"]')
-          .content,
-        headers: { "content-type": "multipart/form-data" }
-      };
-      console.log(params);*/
+      formData.append("image", newImage);
+      formData.append("name", contact.name);
+      formData.append("email", contact.email);
+      formData.append("flagImage", this.flagImage);
+
       axios
-        .post(`/contacts/${contact.id}`, formData,config)
+        .post(`/contacts/${contact.id}`, formData, config)
         .then(response => {
           //console.log(response.data);
           this.editMode = 0;
@@ -143,8 +138,29 @@ export default {
           this.contacts[index] = response.data;
         })
         .catch(error => {
-          console.log(error);
+          this.errors = error.response.data.errors;
+          console.log(this.errors);
         });
+    },
+    any() {
+      return Object.keys(this.errors).length > 0;
+    },
+    hasError(field) {
+      return this.errors.hasOwnProperty(field);
+    },
+
+    getError(field) {
+      if (this.errors[field]) {
+        return this.errors[field][0];
+      }
+    },
+
+    clear(field) {
+      if (field) {
+        delete this.errors[field];
+        return;
+      }
+      this.errors = {};
     }
   }
 };

@@ -1971,12 +1971,27 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
     return {
       image: "",
       name: "",
-      email: ""
+      email: "",
+      errors: {}
     };
   },
   mounted: function mounted() {
@@ -2003,15 +2018,35 @@ __webpack_require__.r(__webpack_exports__);
         var contact = response.data;
 
         _this.$emit("new", contact);
+
+        $("#exampleModal").modal("toggle");
+        _this.$refs.image.value = '';
+        _this.image = "";
+        _this.name = "";
+        _this.email = "";
       })["catch"](function (error) {
-        console.log(error);
+        _this.errors = error.response.data.errors;
+        console.log(_this.errors);
       });
-      this.image = "";
-      this.name = "";
-      this.email = "";
     },
-    hideModal: function hideModal() {
-      $("#exampleModal").modal("toggle");
+    any: function any() {
+      return Object.keys(this.errors).length > 0;
+    },
+    hasError: function hasError(field) {
+      return this.errors.hasOwnProperty(field);
+    },
+    getError: function getError(field) {
+      if (this.errors[field]) {
+        return this.errors[field][0];
+      }
+    },
+    clear: function clear(field) {
+      if (field) {
+        delete this.errors[field];
+        return;
+      }
+
+      this.errors = {};
     }
   }
 });
@@ -2169,6 +2204,9 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   /** contacts es una variable que es enviada por el pomponente padre */
   props: ["contacts"],
@@ -2176,7 +2214,8 @@ __webpack_require__.r(__webpack_exports__);
     return {
       image: "",
       editMode: 0,
-      flagImage: false
+      flagImage: false,
+      errors: {}
     };
   },
   mounted: function mounted() {
@@ -2215,29 +2254,38 @@ __webpack_require__.r(__webpack_exports__);
       }
 
       var formData = new FormData();
-      formData.append('image', newImage);
-      formData.append('name', contact.name);
-      formData.append('email', contact.email);
-      formData.append('flagImage', this.flagImage);
-      /*const params = {
-        image: newImage,
-        name: contact.name,
-        email: contact.email,
-        flagImage: this.flagImage,
-        /*"X-CSRF-TOKEN": document.head.querySelector('meta[name="csrf-token"]')
-          .content,
-        headers: { "content-type": "multipart/form-data" }
-      };
-      console.log(params);*/
-
+      formData.append("image", newImage);
+      formData.append("name", contact.name);
+      formData.append("email", contact.email);
+      formData.append("flagImage", this.flagImage);
       axios.post("/contacts/".concat(contact.id), formData, config).then(function (response) {
         //console.log(response.data);
         _this2.editMode = 0;
         _this2.flagImage = false;
         _this2.contacts[index] = response.data;
       })["catch"](function (error) {
-        console.log(error);
+        _this2.errors = error.response.data.errors;
+        console.log(_this2.errors);
       });
+    },
+    any: function any() {
+      return Object.keys(this.errors).length > 0;
+    },
+    hasError: function hasError(field) {
+      return this.errors.hasOwnProperty(field);
+    },
+    getError: function getError(field) {
+      if (this.errors[field]) {
+        return this.errors[field][0];
+      }
+    },
+    clear: function clear(field) {
+      if (field) {
+        delete this.errors[field];
+        return;
+      }
+
+      this.errors = {};
     }
   }
 });
@@ -37913,6 +37961,9 @@ var render = function() {
                 submit: function($event) {
                   $event.preventDefault()
                   return _vm.newContact()
+                },
+                keydown: function($event) {
+                  return _vm.clear($event.target.name)
                 }
               }
             },
@@ -37922,14 +37973,23 @@ var render = function() {
                   _c("label", { attrs: { for: "photo" } }, [_vm._v("Photo")]),
                   _vm._v(" "),
                   _c("input", {
+                    ref: "image",
                     staticClass: "form-control-file",
+                    class: { errors: _vm.hasError("image") },
                     attrs: {
                       type: "file",
                       name: "image",
                       id: "exampleFormControlFile1"
                     },
                     on: { change: _vm.onFileChange }
-                  })
+                  }),
+                  _vm._v(" "),
+                  _vm.hasError("image")
+                    ? _c("span", {
+                        staticClass: "error-message",
+                        domProps: { textContent: _vm._s(_vm.getError("image")) }
+                      })
+                    : _vm._e()
                 ]),
                 _vm._v(" "),
                 _c("div", { staticClass: "form-group" }, [
@@ -37945,6 +38005,7 @@ var render = function() {
                       }
                     ],
                     staticClass: "form-control",
+                    class: { errors: _vm.hasError("name") },
                     attrs: {
                       type: "text",
                       id: "ContactName",
@@ -37959,7 +38020,14 @@ var render = function() {
                         _vm.name = $event.target.value
                       }
                     }
-                  })
+                  }),
+                  _vm._v(" "),
+                  _vm.hasError("name")
+                    ? _c("span", {
+                        staticClass: "error-message",
+                        domProps: { textContent: _vm._s(_vm.getError("name")) }
+                      })
+                    : _vm._e()
                 ]),
                 _vm._v(" "),
                 _c("div", { staticClass: "form-group" }, [
@@ -37977,6 +38045,7 @@ var render = function() {
                       }
                     ],
                     staticClass: "form-control",
+                    class: { errors: _vm.hasError("email") },
                     attrs: {
                       type: "email",
                       id: "ContactEmail",
@@ -37992,7 +38061,14 @@ var render = function() {
                         _vm.email = $event.target.value
                       }
                     }
-                  })
+                  }),
+                  _vm._v(" "),
+                  _vm.hasError("email")
+                    ? _c("span", {
+                        staticClass: "error-message",
+                        domProps: { textContent: _vm._s(_vm.getError("email")) }
+                      })
+                    : _vm._e()
                 ])
               ]),
               _vm._v(" "),
@@ -38000,22 +38076,8 @@ var render = function() {
                 _c(
                   "button",
                   {
-                    staticClass: "btn btn-secondary",
-                    attrs: { type: "button", "data-dismiss": "modal" }
-                  },
-                  [_vm._v("Close")]
-                ),
-                _vm._v(" "),
-                _c(
-                  "button",
-                  {
                     staticClass: "btn btn-primary",
-                    attrs: { type: "submit" },
-                    on: {
-                      click: function($event) {
-                        return _vm.hideModal()
-                      }
-                    }
+                    attrs: { type: "submit", disabled: _vm.any() }
                   },
                   [_vm._v("Save")]
                 )
@@ -38157,138 +38219,153 @@ var render = function() {
       _c(
         "tbody",
         _vm._l(_vm.contacts, function(contact, index) {
-          return _c("tr", { key: contact.id }, [
-            _c("td", [_vm._v(_vm._s(contact.id))]),
-            _vm._v(" "),
-            _c("td", [
-              _vm.editMode == contact.id
-                ? _c("input", {
-                    staticClass: "form-control-file",
-                    attrs: {
-                      type: "file",
-                      name: "image",
-                      id: "exampleFormControlFile1"
-                    },
-                    on: { change: _vm.onFileChange }
-                  })
-                : _c("img", {
-                    staticClass: "rounded mx-auto d-block",
-                    attrs: {
-                      src:
-                        "http://127.0.0.1:8000/storage/images/" + contact.image,
-                      width: "96",
-                      height: "65"
-                    }
-                  })
-            ]),
-            _vm._v(" "),
-            _c("td", [
-              _vm.editMode == contact.id
-                ? _c("input", {
-                    directives: [
-                      {
-                        name: "model",
-                        rawName: "v-model",
-                        value: contact.name,
-                        expression: "contact.name"
-                      }
-                    ],
-                    staticClass: "form-control",
-                    attrs: { type: "text" },
-                    domProps: { value: contact.name },
-                    on: {
-                      input: function($event) {
-                        if ($event.target.composing) {
-                          return
-                        }
-                        _vm.$set(contact, "name", $event.target.value)
-                      }
-                    }
-                  })
-                : _c("p", [_vm._v(_vm._s(contact.name))])
-            ]),
-            _vm._v(" "),
-            _c("td", [
-              _vm.editMode == contact.id
-                ? _c("input", {
-                    directives: [
-                      {
-                        name: "model",
-                        rawName: "v-model",
-                        value: contact.email,
-                        expression: "contact.email"
-                      }
-                    ],
-                    staticClass: "form-control",
-                    attrs: { type: "text" },
-                    domProps: { value: contact.email },
-                    on: {
-                      input: function($event) {
-                        if ($event.target.composing) {
-                          return
-                        }
-                        _vm.$set(contact, "email", $event.target.value)
-                      }
-                    }
-                  })
-                : _c("p", [_vm._v(_vm._s(contact.email))])
-            ]),
-            _vm._v(" "),
-            _c("td", [
-              _vm.editMode == contact.id
-                ? _c(
-                    "button",
-                    {
-                      staticClass: "btn btn-success btn-icon-split",
-                      on: {
-                        click: function($event) {
-                          return _vm.onClickUpdate(index, contact)
-                        }
-                      }
-                    },
-                    [
-                      _vm._m(1, true),
-                      _vm._v(" "),
-                      _c("span", { staticClass: "text" }, [
-                        _vm._v("Save Changes")
-                      ])
-                    ]
-                  )
-                : _c(
-                    "button",
-                    {
-                      staticClass: "btn btn-warning btn-icon-split",
-                      on: {
-                        click: function($event) {
-                          return _vm.onClickEdit(contact)
-                        }
-                      }
-                    },
-                    [
-                      _vm._m(2, true),
-                      _vm._v(" "),
-                      _c("span", { staticClass: "text" }, [_vm._v("Edit")])
-                    ]
-                  ),
+          return _c(
+            "tr",
+            {
+              key: contact.id,
+              on: {
+                keydown: function($event) {
+                  return _vm.clear($event.target.name)
+                }
+              }
+            },
+            [
+              _c("td", [_vm._v(_vm._s(contact.id))]),
               _vm._v(" "),
-              _c(
-                "button",
-                {
-                  staticClass: "btn btn-danger btn-icon-split",
-                  on: {
-                    click: function($event) {
-                      return _vm.onClickDelete(index, contact)
+              _c("td", [
+                _vm.editMode == contact.id
+                  ? _c("input", {
+                      staticClass: "form-control-file",
+                      class: { errors: _vm.hasError("image") },
+                      attrs: {
+                        type: "file",
+                        name: "image",
+                        id: "exampleFormControlFile1"
+                      },
+                      on: { change: _vm.onFileChange }
+                    })
+                  : _c("img", {
+                      staticClass: "rounded mx-auto d-block",
+                      attrs: {
+                        src:
+                          "http://127.0.0.1:8000/storage/images/" +
+                          contact.image,
+                        width: "96",
+                        height: "65"
+                      }
+                    })
+              ]),
+              _vm._v(" "),
+              _c("td", [
+                _vm.editMode == contact.id
+                  ? _c("input", {
+                      directives: [
+                        {
+                          name: "model",
+                          rawName: "v-model",
+                          value: contact.name,
+                          expression: "contact.name"
+                        }
+                      ],
+                      staticClass: "form-control",
+                      class: { errors: _vm.hasError("name") },
+                      attrs: { type: "text" },
+                      domProps: { value: contact.name },
+                      on: {
+                        input: function($event) {
+                          if ($event.target.composing) {
+                            return
+                          }
+                          _vm.$set(contact, "name", $event.target.value)
+                        }
+                      }
+                    })
+                  : _c("p", [_vm._v(_vm._s(contact.name))])
+              ]),
+              _vm._v(" "),
+              _c("td", [
+                _vm.editMode == contact.id
+                  ? _c("input", {
+                      directives: [
+                        {
+                          name: "model",
+                          rawName: "v-model",
+                          value: contact.email,
+                          expression: "contact.email"
+                        }
+                      ],
+                      staticClass: "form-control",
+                      class: { errors: _vm.hasError("email") },
+                      attrs: { type: "text" },
+                      domProps: { value: contact.email },
+                      on: {
+                        input: function($event) {
+                          if ($event.target.composing) {
+                            return
+                          }
+                          _vm.$set(contact, "email", $event.target.value)
+                        }
+                      }
+                    })
+                  : _c("p", [_vm._v(_vm._s(contact.email))])
+              ]),
+              _vm._v(" "),
+              _c("td", [
+                _vm.editMode == contact.id
+                  ? _c(
+                      "button",
+                      {
+                        staticClass: "btn btn-success btn-icon-split",
+                        on: {
+                          click: function($event) {
+                            return _vm.onClickUpdate(index, contact)
+                          }
+                        }
+                      },
+                      [
+                        _vm._m(1, true),
+                        _vm._v(" "),
+                        _c("span", { staticClass: "text" }, [
+                          _vm._v("Save Changes")
+                        ])
+                      ]
+                    )
+                  : _c(
+                      "button",
+                      {
+                        staticClass: "btn btn-warning btn-icon-split",
+                        on: {
+                          click: function($event) {
+                            return _vm.onClickEdit(contact)
+                          }
+                        }
+                      },
+                      [
+                        _vm._m(2, true),
+                        _vm._v(" "),
+                        _c("span", { staticClass: "text" }, [_vm._v("Edit")])
+                      ]
+                    ),
+                _vm._v(" "),
+                _c(
+                  "button",
+                  {
+                    staticClass: "btn btn-danger btn-icon-split",
+                    on: {
+                      click: function($event) {
+                        return _vm.onClickDelete(index, contact)
+                      }
                     }
-                  }
-                },
-                [
-                  _vm._m(3, true),
-                  _vm._v(" "),
-                  _c("span", { staticClass: "text" }, [_vm._v("Delete")])
-                ]
-              )
-            ])
-          ])
+                  },
+                  [
+                    _vm._m(3, true),
+                    _vm._v(" "),
+                    _c("span", { staticClass: "text" }, [_vm._v("Delete")])
+                  ]
+                )
+              ])
+            ]
+          )
         }),
         0
       )
