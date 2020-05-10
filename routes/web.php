@@ -19,12 +19,14 @@ Route::get('/', function () {
 
 Auth::routes();
 
-Route::get('/home', 'HomeController@index')->name('home');
+Route::group(['middleware' => ['auth']], function () {
+    Route::get('/home', 'HomeController@index')->name('home');
 
-Route::get('/contacts','ContactController@index');
+    Route::get('/contacts','ContactController@index');
 
-Route::post('/contacts','ContactController@store');
+    Route::post('/contacts','ContactController@store');
 
-Route::post('/contacts/{contact}','ContactController@update');
+    Route::post('/contacts/{contact}','ContactController@update');
 
-Route::delete('/contacts/{id}','ContactController@destroy');
+    Route::delete('/contacts/{id}','ContactController@destroy');
+});

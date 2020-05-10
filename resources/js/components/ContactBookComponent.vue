@@ -19,33 +19,37 @@
       <div class="card-body">
         <div class="table-responsive">
           <!--Envio de datos de un componente padre a un componente hijo-->
-          <v-contacts-table :contacts="contacts"></v-contacts-table>
+          <contacts-table :contacts="contacts"></contacts-table>
         </div>
       </div>
     </div>
 
-    <add-contact @new="addContact"></add-contact>
+    <add-contact @new="add"></add-contact>
   </div>
 </template>
 
 <script>
 export default {
-  data() {
-    return {
-      contacts: []
-    };
-  },
-  mounted() {
-    axios.get('/contacts').then((response)=>{
-        this.contacts = response.data;
-    }).catch((error)=>{
-        console.log(error);
-    });
-  },
-  methods: {
-    addContact(contact) {
-      this.contacts.push(contact);
+    data() {
+        return {
+            contacts: []
+        };
+    },
+
+    mounted() {
+        axios
+            .get('/contacts').then((response) => {
+                this.contacts = response.data;
+            })
+            .catch((error) => {
+                console.log(error);
+            });
+    },
+
+    methods: {
+        add(contact) {
+            this.contacts.push(contact);
+        }
     }
-  }
 };
 </script>

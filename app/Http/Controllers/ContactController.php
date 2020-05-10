@@ -3,24 +3,18 @@
 namespace App\Http\Controllers;
 
 use App\Contact;
-use App\Http\Requests\StoreContact;
+use App\Http\Requests\ContactRequest;
 use Illuminate\Http\Request;
-use Illuminate\Support\Str;
-use Illuminate\Support\Facades\Storage;
 
 class ContactController extends Controller
 {
-    public function __construct()
-    {
-        $this->middleware('auth');
-    }
 
     public function index()
     {
-        return Contact::where('user_id', auth()->id())->get();
+        return Contact::whereUserId(auth()->id())->get();
     }
 
-    public function store(StoreContact $request)
+    public function store(ContactRequest $request)
     {
         $fileName = 'usuario.jpg';
 
@@ -38,11 +32,11 @@ class ContactController extends Controller
         ]);
     }
 
-    public function update(StoreContact $request, $id)
+    public function update(ContactRequest $request, $id)
     {
-        $contact = Contact::find($id);
+        $contact = Contact::findOrFail($id);
 
-        if($request->flagImage === "true" && $request->has('image') && $request->image != ""){
+        if ($request->flagImage === "true" && $request->has('image') && $request->image != "") {
             $file = $request->file('image');
             $fileName = time() . '.' . $file->getClientOriginalExtension();
             $file->storeAs('images', $fileName, 'public');

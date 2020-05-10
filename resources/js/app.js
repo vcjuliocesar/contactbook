@@ -20,7 +20,7 @@ window.Vue = require('vue');
 // files.keys().map(key => Vue.component(key.split('/').pop().split('.')[0], files(key).default))
 
 Vue.component('contact-book', require('./components/ContactBookComponent.vue').default);
-Vue.component('v-contacts-table', require('./components/TableContactsComponent.vue').default);
+Vue.component('contacts-table', require('./components/ContactsTableComponent.vue').default);
 Vue.component('add-contact', require('./components/AddContactComponent.vue').default);
 /**
  * Next, we will create a fresh Vue application instance and attach it to

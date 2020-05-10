@@ -3,9 +3,8 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rule;
 
-class StoreContact extends FormRequest
+class ContactRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -27,9 +26,7 @@ class StoreContact extends FormRequest
         return [
             'image'=>'nullable|sometimes|image|mimes:jpeg,jpg,png',
             'name'=>'required',
-            'email'=>["required","email",
-                Rule::unique('contacts', 'email')->ignore($this->contact)
-            ]
+            'email' => 'required|email|unique:App\Contact,email',
         ];
     }
 }
